@@ -14,7 +14,7 @@ interface TodoItemProps {
         dueDate?: Date | null;
         imageUrl?: string | null;
     };
-    onToggle: (id: string) => void;
+    onToggle: (id: string, completed: boolean) => void;
     onDelete: (id: string) => void;
     onShare?: (id: string) => void;
     onRewrite?: (id: string) => void;
@@ -29,7 +29,7 @@ export function TodoItem({ todo, onToggle, onDelete, onShare, onRewrite }: TodoI
             )}
         >
             <button
-                onClick={() => onToggle(todo.id)}
+                onClick={() => onToggle(todo.id, !todo.completed)}
                 className={clsx(
                     "mt-1 flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors",
                     todo.completed

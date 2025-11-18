@@ -3,15 +3,13 @@
 import React, { useState } from "react";
 import { Plus, Image as ImageIcon, Calendar } from "lucide-react";
 
+import { createTodo } from "@/app/actions";
+
 export function AddTodo() {
     const [isOpen, setIsOpen] = useState(false);
-    const [title, setTitle] = useState("");
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        // TODO: Call server action
-        console.log("Add todo:", title);
-        setTitle("");
+    const handleSubmit = async (formData: FormData) => {
+        await createTodo(formData);
         setIsOpen(false);
     };
 
@@ -28,14 +26,20 @@ export function AddTodo() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl shadow-lg p-4 animate-in fade-in zoom-in-95 duration-200">
+        <form action={handleSubmit} className="bg-white border border-gray-200 rounded-xl shadow-lg p-4 animate-in fade-in zoom-in-95 duration-200">
             <input
                 type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                name="title"
                 placeholder="What needs to be done?"
                 className="w-full text-lg font-medium placeholder:text-gray-400 border-none outline-none bg-transparent"
                 autoFocus
+                required
+            />
+            <input
+                type="text"
+                name="description"
+                placeholder="Description (optional)"
+                className="w-full mt-2 text-sm text-gray-600 placeholder:text-gray-400 border-none outline-none bg-transparent"
             />
             <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -56,8 +60,7 @@ export function AddTodo() {
                     </button>
                     <button
                         type="submit"
-                        disabled={!title.trim()}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-colors"
+                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
                     >
                         Add Task
                     </button>
