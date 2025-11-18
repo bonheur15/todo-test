@@ -3,7 +3,7 @@ import { TodoItem } from "@/components/TodoItem";
 import { db } from "@/db";
 import { todos } from "@/db/schema";
 import { desc } from "drizzle-orm";
-import { toggleTodo, deleteTodo } from "./actions";
+import { toggleTodo, deleteTodo, rewriteTodo, shareTodo } from "./actions";
 
 export default async function Home() {
   const allTodos = await db.select().from(todos).orderBy(desc(todos.createdAt));
@@ -27,6 +27,8 @@ export default async function Home() {
               todo={todo}
               onToggle={toggleTodo}
               onDelete={deleteTodo}
+              onRewrite={rewriteTodo}
+              onShare={shareTodo}
             />
           ))}
         </div>

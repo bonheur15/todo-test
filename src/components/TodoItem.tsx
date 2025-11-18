@@ -16,11 +16,19 @@ interface TodoItemProps {
     };
     onToggle: (id: string, completed: boolean) => void;
     onDelete: (id: string) => void;
-    onShare?: (id: string) => void;
-    onRewrite?: (id: string) => void;
+    onShare?: (id: string, email: string) => Promise<void>;
+    onRewrite?: (id: string) => Promise<void>;
 }
 
 export function TodoItem({ todo, onToggle, onDelete, onShare, onRewrite }: TodoItemProps) {
+    const handleShare = async () => {
+        if (!onShare) return;
+        const email = window.prompt("Enter email to share with:");
+        if (email) {
+            await onShare(todo.id, email);
+        }
+    };
+
     return (
         <div
             className={clsx(
@@ -80,7 +88,7 @@ export function TodoItem({ todo, onToggle, onDelete, onShare, onRewrite }: TodoI
                 )}
                 {onShare && (
                     <button
-                        onClick={() => onShare(todo.id)}
+                        onClick={handleShare}
                         className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
                         title="Share"
                     >
