@@ -8,10 +8,21 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { rewriteTodoWithAI } from "@/lib/gemini";
 import { sendEmail } from "@/lib/email";
+import { uploadImage } from "@/lib/cloudinary";
 
 export async function createTodo(formData: FormData) {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
+    const imageFile = formData.get("image") as File;
+
+    let imageUrl = null;
+    if (imageFile && imageFile.size > 0) {
+        try {
+            imageUrl = await uploadImage(imageFile);
+        } catch (error) {
+            console.error("Image upload failed:", error);
+        }
+    }
     // const session = await auth.api.getSession({ headers: await headers() });
 
     // if (!session) {
@@ -25,6 +36,7 @@ export async function createTodo(formData: FormData) {
         id: crypto.randomUUID(),
         title,
         description,
+        imageUrl,
         userId: userId, // session.user.id
     });
 

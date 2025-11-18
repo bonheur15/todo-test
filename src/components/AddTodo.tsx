@@ -25,6 +25,8 @@ export function AddTodo() {
         );
     }
 
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
     return (
         <form action={handleSubmit} className="bg-white border border-gray-200 rounded-xl shadow-lg p-4 animate-in fade-in zoom-in-95 duration-200">
             <input
@@ -41,12 +43,23 @@ export function AddTodo() {
                 placeholder="Description (optional)"
                 className="w-full mt-2 text-sm text-gray-600 placeholder:text-gray-400 border-none outline-none bg-transparent"
             />
+            <input
+                type="file"
+                name="image"
+                ref={fileInputRef}
+                className="hidden"
+                accept="image/*"
+            />
             <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <button type="button" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                         <Calendar size={18} />
                     </button>
-                    <button type="button" className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
                         <ImageIcon size={18} />
                     </button>
                 </div>
