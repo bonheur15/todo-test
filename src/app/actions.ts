@@ -1,11 +1,13 @@
 "use server";
 
 import { db } from "@/db";
-import { todos } from "@/db/schema";
+import { todos, shares } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { auth } from "@/lib/auth"; // Import auth to get session
+import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
+import { rewriteTodoWithAI } from "@/lib/gemini";
+import { sendEmail } from "@/lib/email";
 
 export async function createTodo(formData: FormData) {
     const title = formData.get("title") as string;
@@ -36,5 +38,45 @@ export async function toggleTodo(id: string, completed: boolean) {
 
 export async function deleteTodo(id: string) {
     await db.delete(todos).where(eq(todos.id, id));
+    revalidatePath("/");
+}
+
+export async function rewriteTodo(id: string) {
+    const todo = await db.query.todos.findFirst({
+        where: eq(todos.id, id),
+    });
+
+    if (!todo) return;
+
+    try {
+        const newTitle = await rewriteTodoWithAI(todo.title);
+        await db.update(todos).set({ title: newTitle }).where(eq(todos.id, id));
+        revalidatePath("/");
+    } catch (error) {
+        console.error("AI Rewrite failed:", error);
+        // Handle error (e.g., return error state)
+    }
+}
+
+export async function shareTodo(id: string, email: string) {
+    const todo = await db.query.todos.findFirst({
+        where: eq(todos.id, id),
+    });
+
+    if (!todo) return;
+
+    await db.insert(shares).values({
+        id: crypto.randomUUID(),
+        todoId: id,
+        sharedWithEmail: email,
+        permission: "view",
+    });
+
+    await sendEmail(
+        email,
+        "Todo Shared with You",
+        `<p>A todo item "<strong>${todo.title}</strong>" has been shared with you.</p>`
+    );
+
     revalidatePath("/");
 }
